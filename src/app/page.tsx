@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import DashboardLayout from "./(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,10 +19,11 @@ import {
   Clock,
   Navigation,
   ShieldCheck,
-  Flame
+  Flame,
+  AlertTriangle
 } from "lucide-react"
 import dynamic from "next/dynamic"
-import { ORDERS, VEHICLES, COORDINATES } from "@/lib/mock-data"
+import { ORDERS, VEHICLES } from "@/lib/mock-data"
 import { calculateCarbonEmission } from "@/lib/carbon-engine"
 import { useToast } from "@/hooks/use-toast"
 import { optimizeFleetOrders } from "@/lib/fleet-optimizer"
@@ -31,11 +32,6 @@ import { getGridStatus } from "@/lib/grid-carbon-service"
 const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
   loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Command Map...</div>
-})
-
-const CarbonHeatmap = dynamic(() => import("@/components/carbon-heatmap"), {
-  ssr: false,
-  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Generating Emission Heatmap...</div>
 })
 
 export default function HomePage() {
@@ -48,17 +44,6 @@ export default function HomePage() {
     ordersOptimized: ORDERS.length,
     avgTime: 38
   })
-
-  // Prepare heatmap data based on orders
-  const heatmapData = useMemo(() => {
-    return ORDERS.map(order => {
-      const coords = COORDINATES[order.pickup as keyof typeof COORDINATES] || [12.9716, 77.5946];
-      // Normalize emission for intensity (0 to 1)
-      const emission = calculateCarbonEmission(order.distance, 'diesel').co2Emission;
-      const intensity = Math.min(emission / 10, 1.0); // Scale: 10kg CO2 is max heat
-      return [coords[0], coords[1], intensity] as [number, number, number];
-    });
-  }, []);
 
   const runGlobalOptimization = async () => {
     setIsOptimizing(true)
@@ -183,21 +168,43 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden shadow-2xl border-none">
-            <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
-               <div>
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    <Flame className="h-5 w-5 text-orange-500" />
-                    City Carbon Emission Heatmap
-                  </CardTitle>
-                  <CardDescription>Identifying environmental "hotspots" to prioritize EV transitioning</CardDescription>
-               </div>
-               <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground">
-                  Low <div className="h-2 w-12 bg-gradient-to-r from-blue-500 via-lime-500 to-red-500 rounded-full mx-1" /> High
-               </div>
+          <Card className="shadow-lg border-none">
+            <CardHeader className="bg-muted/30 border-b">
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-orange-500" />
+                <CardTitle className="text-lg">City Carbon Emission Hotspots</CardTitle>
+              </div>
+              <CardDescription>Identifying environmental pressure zones to prioritize EV transition</CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
-               <CarbonHeatmap data={heatmapData} />
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 border rounded-xl bg-orange-500/5 border-orange-500/20 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold">Electronic City</p>
+                    <AlertTriangle className="h-4 w-4 text-orange-500" />
+                  </div>
+                  <p className="text-[10px] uppercase font-black text-orange-600 tracking-tighter">High Carbon Density</p>
+                  <p className="text-xs text-muted-foreground">Highest concentration of diesel distribution. Priority 1 for EV conversion.</p>
+                </div>
+
+                <div className="p-4 border rounded-xl bg-yellow-500/5 border-yellow-500/20 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold">Whitefield</p>
+                    <Activity className="h-4 w-4 text-yellow-500" />
+                  </div>
+                  <p className="text-[10px] uppercase font-black text-yellow-600 tracking-tighter">Transition Zone</p>
+                  <p className="text-xs text-muted-foreground">Mixed fleet operations. 45% optimized via current green corridors.</p>
+                </div>
+
+                <div className="p-4 border rounded-xl bg-accent/5 border-accent/20 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-bold">Koramangala</p>
+                    <ShieldCheck className="h-4 w-4 text-accent" />
+                  </div>
+                  <p className="text-[10px] uppercase font-black text-accent tracking-tighter">Green Leader</p>
+                  <p className="text-xs text-muted-foreground">High EV adoption rate. Successfully meeting sustainability targets.</p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
