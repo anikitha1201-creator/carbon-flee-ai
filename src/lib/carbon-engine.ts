@@ -1,11 +1,11 @@
 /**
- * @fileOverview Core module for calculating carbon emissions based on PPT specification.
+ * @fileOverview Core module for calculating carbon emissions based on specification.
  */
 
 export const EMISSION_FACTORS = {
-  diesel: 0.25,
-  electric: 0.02,
-  hybrid: 0.12,
+  diesel: 0.25,      // kg CO2 per km
+  electric: 0.02,    // kg CO2 per km
+  hybrid: 0.12,      // kg CO2 per km
 };
 
 export interface CarbonResult {
@@ -26,9 +26,9 @@ export function calculateCarbonEmission(distanceKm: number, vehicleType: keyof t
 
 export function calculateFuelCost(distanceKm: number, vehicleType: keyof typeof EMISSION_FACTORS): number {
   const rates = {
-    diesel: 12,
-    electric: 3,
-    hybrid: 7,
+    diesel: 12,    // Fuel cost per km
+    electric: 3,   // Charging cost per km
+    hybrid: 7,     // Mixed cost per km
   };
   return distanceKm * (rates[vehicleType] || 12);
 }

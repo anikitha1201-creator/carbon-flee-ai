@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -7,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { 
-  Truck, 
   Leaf, 
   DollarSign, 
   ArrowUpRight, 
@@ -29,6 +27,7 @@ import { useToast } from "@/hooks/use-toast"
 import { optimizeFleetOrders } from "@/lib/fleet-optimizer"
 import { getGridStatus } from "@/lib/grid-carbon-service"
 
+// Import Map dynamically to avoid SSR issues
 const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
   loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Command Map...</div>
@@ -47,7 +46,6 @@ export default function HomePage() {
 
   const runGlobalOptimization = async () => {
     setIsOptimizing(true)
-    // Simulate engine processing
     await new Promise(r => setTimeout(r, 1500))
     
     const grid = getGridStatus('Solar Peak')
@@ -101,10 +99,7 @@ export default function HomePage() {
             <CardContent>
               <div className="text-3xl font-black">{metrics.co2Saved} kg</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
-                <span className="text-accent flex items-center">
-                  <ArrowUpRight className="h-3 w-3" /> +18.4%
-                </span>
-                Efficiency Gain
+                <span className="text-accent flex items-center"><ArrowUpRight className="h-3 w-3" /> +18.4%</span> Efficiency Gain
               </p>
             </CardContent>
           </Card>
@@ -116,10 +111,7 @@ export default function HomePage() {
             <CardContent>
               <div className="text-3xl font-black">{metrics.evUtilization}%</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
-                <span className="text-primary flex items-center">
-                  <Activity className="h-3 w-3" /> Grid Active
-                </span>
-                Optimized
+                <span className="text-primary flex items-center"><Activity className="h-3 w-3" /> Grid Active</span> Optimized
               </p>
             </CardContent>
           </Card>
@@ -130,9 +122,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-black">{metrics.ordersOptimized}</div>
-              <p className="text-[10px] text-muted-foreground mt-1 font-bold">
-                100% Automation Status
-              </p>
+              <p className="text-[10px] text-muted-foreground mt-1 font-bold">100% Automation Status</p>
             </CardContent>
           </Card>
           <Card className="hover:shadow-md transition-shadow cursor-default border-l-4 border-l-orange-500 bg-orange-500/5">
@@ -143,10 +133,7 @@ export default function HomePage() {
             <CardContent>
               <div className="text-3xl font-black">₹{metrics.fuelSaved}</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
-                <span className="text-accent flex items-center">
-                  <TrendingDown className="h-3 w-3" /> -12%
-                </span>
-                OpEx Reduction
+                <span className="text-accent flex items-center"><TrendingDown className="h-3 w-3" /> -12%</span> OpEx Reduction
               </p>
             </CardContent>
           </Card>
@@ -184,72 +171,27 @@ export default function HomePage() {
                     <AlertTriangle className="h-4 w-4 text-orange-500" />
                   </div>
                   <p className="text-[10px] uppercase font-black text-orange-600 tracking-tighter">High Carbon Density</p>
-                  <p className="text-xs text-muted-foreground">Highest concentration of diesel distribution. Priority 1 for EV conversion.</p>
+                  <p className="text-xs text-muted-foreground">Priority 1 for EV conversion.</p>
                 </div>
-
                 <div className="p-4 border rounded-xl bg-yellow-500/5 border-yellow-500/20 space-y-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-bold">Whitefield</p>
                     <Activity className="h-4 w-4 text-yellow-500" />
                   </div>
                   <p className="text-[10px] uppercase font-black text-yellow-600 tracking-tighter">Transition Zone</p>
-                  <p className="text-xs text-muted-foreground">Mixed fleet operations. 45% optimized via current green corridors.</p>
+                  <p className="text-xs text-muted-foreground">45% optimized via current green corridors.</p>
                 </div>
-
                 <div className="p-4 border rounded-xl bg-accent/5 border-accent/20 space-y-1">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-bold">Koramangala</p>
                     <ShieldCheck className="h-4 w-4 text-accent" />
                   </div>
                   <p className="text-[10px] uppercase font-black text-accent tracking-tighter">Green Leader</p>
-                  <p className="text-xs text-muted-foreground">High EV adoption rate. Successfully meeting sustainability targets.</p>
+                  <p className="text-xs text-muted-foreground">Successfully meeting sustainability targets.</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card className="bg-card border shadow-sm p-6 space-y-2">
-               <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span className="text-[10px] uppercase font-bold">Avg. Time / Route</span>
-               </div>
-               <p className="text-2xl font-black">{metrics.avgTime} min</p>
-               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-primary w-3/4" />
-               </div>
-            </Card>
-            <Card className="bg-card border shadow-sm p-6 space-y-2">
-               <div className="flex items-center gap-2 text-muted-foreground">
-                  <ShieldCheck className="h-4 w-4" />
-                  <span className="text-[10px] uppercase font-bold">Efficiency Score</span>
-               </div>
-               <p className="text-2xl font-black text-accent">94%</p>
-               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-accent w-[94%]" />
-               </div>
-            </Card>
-            <Card className="bg-card border shadow-sm p-6 space-y-2">
-               <div className="flex items-center gap-2 text-muted-foreground">
-                  <PackageCheck className="h-4 w-4" />
-                  <span className="text-[10px] uppercase font-bold">Total Deliveries</span>
-               </div>
-               <p className="text-2xl font-black">124</p>
-               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-secondary w-2/3" />
-               </div>
-            </Card>
-            <Card className="bg-card border shadow-sm p-6 space-y-2">
-               <div className="flex items-center gap-2 text-muted-foreground">
-                  <Navigation className="h-4 w-4" />
-                  <span className="text-[10px] uppercase font-bold">Total Distance</span>
-               </div>
-               <p className="text-2xl font-black">1,842 km</p>
-               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-orange-500 w-4/5" />
-               </div>
-            </Card>
-          </div>
         </div>
       </div>
     </DashboardLayout>

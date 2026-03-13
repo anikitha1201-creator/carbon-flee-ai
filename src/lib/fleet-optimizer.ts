@@ -37,14 +37,15 @@ export function optimizeFleetOrders(
   if (eligibleVehicles.length === 0) return null;
 
   // 2. Calculate score: 1 - (gridIntensity * vehicleFactor)
+  // Scaling grid intensity (kg CO2/kWh) with vehicle factors (kg CO2/km)
   const scoredVehicles = eligibleVehicles.map(v => {
     const vehicleFactor = EMISSION_FACTORS[v.type];
-    // Scale grid intensity for scoring purposes
-    const score = 1 - (gridCarbonIntensity * vehicleFactor);
+    // Score reflects environmental preference: higher is better
+    const score = 1 - (gridCarbonIntensity * vehicleFactor * 10); 
     return { vehicle: v, score };
   });
 
-  // 3. Select best
+  // 3. Select best scoring vehicle
   const best = scoredVehicles.sort((a, b) => b.score - a.score)[0];
 
   return {

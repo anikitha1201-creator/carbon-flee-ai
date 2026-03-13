@@ -1,14 +1,13 @@
-
 "use client";
 
 import { MapContainer, TileLayer, Polyline, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Leaf, Fuel, Zap } from "lucide-react";
 
-// Marker fix for Leaflet - ensures it runs once and correctly in Next.js
+// Marker fix for Leaflet
 let markerFixed = false;
 if (typeof window !== 'undefined' && !markerFixed) {
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -20,7 +19,6 @@ if (typeof window !== 'undefined' && !markerFixed) {
   markerFixed = true;
 }
 
-// Helper component to fit map bounds to the route
 function FitBounds({ route }: { route: [number, number][] }) {
   const map = useMap();
   useEffect(() => {
@@ -60,28 +58,16 @@ export default function RouteComparison() {
           </div>
           <CardContent className="p-0">
             <div className="h-[350px] w-full">
-              <MapContainer
-                center={[12.96, 77.70]}
-                zoom={12}
-                className="h-full w-full"
-                scrollWheelZoom={false}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+              <MapContainer center={[12.96, 77.70]} zoom={12} className="h-full w-full" scrollWheelZoom={false}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Polyline positions={dieselRoute} color="#ef4444" weight={5} opacity={0.7} dashArray="10, 10" />
-                <Marker position={dieselRoute[0]}>
-                  <Popup>Pickup: Whitefield</Popup>
-                </Marker>
-                <Marker position={dieselRoute[2]}>
-                  <Popup>Dropoff: Koramangala</Popup>
-                </Marker>
+                <Marker position={dieselRoute[0]}><Popup>Pickup: Whitefield</Popup></Marker>
+                <Marker position={dieselRoute[2]}><Popup>Dropoff: Koramangala</Popup></Marker>
                 <FitBounds route={dieselRoute} />
               </MapContainer>
             </div>
             <div className="p-6 grid grid-cols-3 gap-4 border-t bg-muted/20">
-              <div className="space-y-1">
+              <div className="space-y-1 text-center">
                 <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">CO₂ Emissions</p>
                 <p className="text-xl font-black text-foreground">4.5 kg</p>
               </div>
@@ -89,7 +75,7 @@ export default function RouteComparison() {
                 <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Fuel Cost</p>
                 <p className="text-xl font-black text-foreground">₹213</p>
               </div>
-              <div className="space-y-1 text-right">
+              <div className="space-y-1 text-center">
                 <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Est. Time</p>
                 <p className="text-xl font-black text-foreground">45 min</p>
               </div>
@@ -109,28 +95,16 @@ export default function RouteComparison() {
           </div>
           <CardContent className="p-0">
             <div className="h-[350px] w-full">
-              <MapContainer
-                center={[12.96, 77.70]}
-                zoom={12}
-                className="h-full w-full"
-                scrollWheelZoom={false}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+              <MapContainer center={[12.96, 77.70]} zoom={12} className="h-full w-full" scrollWheelZoom={false}>
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Polyline positions={greenRoute} color="#10b981" weight={6} opacity={0.8} />
-                <Marker position={greenRoute[0]}>
-                  <Popup>Pickup: Whitefield</Popup>
-                </Marker>
-                <Marker position={greenRoute[2]}>
-                  <Popup>Dropoff: Koramangala</Popup>
-                </Marker>
+                <Marker position={greenRoute[0]}><Popup>Pickup: Whitefield</Popup></Marker>
+                <Marker position={greenRoute[2]}><Popup>Dropoff: Koramangala</Popup></Marker>
                 <FitBounds route={greenRoute} />
               </MapContainer>
             </div>
             <div className="p-6 grid grid-cols-3 gap-4 border-t bg-accent/5">
-              <div className="space-y-1">
+              <div className="space-y-1 text-center">
                 <p className="text-[10px] uppercase font-bold text-accent tracking-wider">CO₂ Saved</p>
                 <p className="text-xl font-black text-foreground">2.79 kg</p>
               </div>
@@ -138,7 +112,7 @@ export default function RouteComparison() {
                 <p className="text-[10px] uppercase font-bold text-accent tracking-wider">Energy Cost</p>
                 <p className="text-xl font-black text-foreground">₹166</p>
               </div>
-              <div className="space-y-1 text-right">
+              <div className="space-y-1 text-center">
                 <p className="text-[10px] uppercase font-bold text-accent tracking-wider">Time Saved</p>
                 <p className="text-xl font-black text-foreground">35 min</p>
               </div>
@@ -147,18 +121,15 @@ export default function RouteComparison() {
         </Card>
       </div>
 
-      {/* Impact Summary Banner */}
-      <Card className="border-accent/30 bg-accent/5 shadow-inner">
-        <CardContent className="p-6 text-center space-y-3">
+      <div className="lg:col-span-2 text-center p-6 border rounded-xl bg-accent/10 border-accent/30 shadow-inner">
           <div className="flex items-center justify-center gap-2 text-accent">
             <Zap className="h-6 w-6 fill-current" />
             <h3 className="text-xl font-bold tracking-tight">Environmental Performance Breakthrough</h3>
           </div>
-          <p className="text-lg font-medium text-muted-foreground max-w-2xl mx-auto">
-            CAFS optimization achieved a <span className="text-accent font-black underline decoration-accent/30 underline-offset-4">38% reduction</span> in carbon emissions while improving delivery speeds by <span className="font-bold text-foreground">10 minutes</span> and cutting operational costs by <span className="font-bold text-foreground">22%</span>.
+          <p className="text-lg font-medium text-muted-foreground max-w-2xl mx-auto mt-2">
+            CAFS optimization achieved a <span className="text-accent font-black underline decoration-accent/30 underline-offset-4">38% reduction</span> in carbon emissions.
           </p>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   );
 }

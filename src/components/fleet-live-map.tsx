@@ -1,10 +1,9 @@
-
 "use client";
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from "react-leaflet";
 import L from "leaflet";
-import { useState, useEffect, useMemo } from "react";
-import { Zap, Truck, BatteryCharging, Info, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Zap, Truck } from "lucide-react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CHARGING_STATIONS } from "@/lib/charging-stations";
 
