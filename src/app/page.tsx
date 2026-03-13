@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useMemo } from "react"
 import DashboardLayout from "./(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,11 +18,12 @@ import {
   Play,
   Clock,
   Navigation,
-  ShieldCheck
+  ShieldCheck,
+  Flame
 } from "lucide-react"
 import dynamic from "next/dynamic"
-import { ORDERS, VEHICLES } from "@/lib/mock-data"
-import { calculateCarbonEmission, calculateFuelCost } from "@/lib/carbon-engine"
+import { ORDERS, VEHICLES, COORDINATES } from "@/lib/mock-data"
+import { calculateCarbonEmission } from "@/lib/carbon-engine"
 import { useToast } from "@/hooks/use-toast"
 import { optimizeFleetOrders } from "@/lib/fleet-optimizer"
 import { getGridStatus } from "@/lib/grid-carbon-service"
@@ -30,6 +31,11 @@ import { getGridStatus } from "@/lib/grid-carbon-service"
 const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
   loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Command Map...</div>
+})
+
+const CarbonHeatmap = dynamic(() => import("@/components/carbon-heatmap"), {
+  ssr: false,
+  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Generating Emission Heatmap...</div>
 })
 
 export default function HomePage() {
@@ -42,6 +48,17 @@ export default function HomePage() {
     ordersOptimized: ORDERS.length,
     avgTime: 38
   })
+
+  // Prepare heatmap data based on orders
+  const heatmapData = useMemo(() => {
+    return ORDERS.map(order => {
+      const coords = COORDINATES[order.pickup as keyof typeof COORDINATES] || [12.9716, 77.5946];
+      // Normalize emission for intensity (0 to 1)
+      const emission = calculateCarbonEmission(order.distance, 'diesel').co2Emission;
+      const intensity = Math.min(emission / 10, 1.0); // Scale: 10kg CO2 is max heat
+      return [coords[0], coords[1], intensity] as [number, number, number];
+    });
+  }, []);
 
   const runGlobalOptimization = async () => {
     setIsOptimizing(true)
@@ -74,7 +91,7 @@ export default function HomePage() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-8 pb-12">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Fleet Command Center</h1>
@@ -150,7 +167,7 @@ export default function HomePage() {
           </Card>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-8">
           <Card className="overflow-hidden shadow-2xl border-none">
             <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                <div>
@@ -163,6 +180,24 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="p-0">
                <FleetLiveMap />
+            </CardContent>
+          </Card>
+
+          <Card className="overflow-hidden shadow-2xl border-none">
+            <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
+               <div>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Flame className="h-5 w-5 text-orange-500" />
+                    City Carbon Emission Heatmap
+                  </CardTitle>
+                  <CardDescription>Identifying environmental "hotspots" to prioritize EV transitioning</CardDescription>
+               </div>
+               <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground">
+                  Low <div className="h-2 w-12 bg-gradient-to-r from-blue-500 via-lime-500 to-red-500 rounded-full mx-1" /> High
+               </div>
+            </CardHeader>
+            <CardContent className="p-0">
+               <CarbonHeatmap data={heatmapData} />
             </CardContent>
           </Card>
 
