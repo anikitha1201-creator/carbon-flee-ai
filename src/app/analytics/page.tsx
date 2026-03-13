@@ -5,7 +5,6 @@ import { useState } from "react"
 import DashboardLayout from "../(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { 
   FileText, 
   Download, 
@@ -28,7 +27,7 @@ import dynamic from "next/dynamic"
 // Import Map components dynamically to avoid SSR issues
 const RouteComparison = dynamic(() => import("@/components/route-comparison"), { 
   ssr: false,
-  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Loading Comparison Maps...</div>
+  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground font-medium">Initializing Strategic Comparison Maps...</div>
 })
 
 const PERFORMANCE_METRICS = [
@@ -152,31 +151,8 @@ export default function AnalyticsPage() {
           
           <RouteComparison />
 
-          <Card className="bg-accent/5 border-accent/20 shadow-sm overflow-hidden">
-             <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row items-center gap-6">
-                   <div className="h-16 w-16 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                      <ShieldCheck className="h-10 w-10 text-accent" />
-                   </div>
-                   <div className="space-y-2 flex-1 text-center md:text-left">
-                      <h3 className="text-lg font-bold text-accent">Sustainability Impact Verified</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        The Carbon-Aware Fleet Scheduling (CAFS) engine successfully reduced delivery emissions by <span className="font-bold text-foreground">38%</span>, saved <span className="font-bold text-foreground">22%</span> in fuel costs, and improved delivery efficiency by <span className="font-bold text-foreground">10 minutes</span> per optimized route compared to standard diesel baselines.
-                      </p>
-                   </div>
-                   <div className="flex items-center gap-2">
-                      <div className="p-3 rounded-lg bg-background border text-center min-w-[100px]">
-                         <p className="text-[10px] font-bold uppercase text-muted-foreground">CO₂ Gap</p>
-                         <p className="text-xl font-black text-accent">-1.71 kg</p>
-                      </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                      <div className="p-3 rounded-lg bg-accent text-accent-foreground text-center min-w-[100px]">
-                         <p className="text-[10px] font-bold uppercase opacity-80">Reduction</p>
-                         <p className="text-xl font-black">38%</p>
-                      </div>
-                   </div>
-                </div>
-             </CardContent>
+          <Card className="bg-accent/5 border-accent/20 shadow-sm overflow-hidden hidden">
+             {/* Original card logic hidden in favor of content inside RouteComparison */}
           </Card>
         </div>
 
