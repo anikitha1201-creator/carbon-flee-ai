@@ -1,5 +1,2 @@
-# Firebase Studio
-
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+Here is our deployed link 
+https://carbon-git-main-ankithavs-projects.vercel.app/
