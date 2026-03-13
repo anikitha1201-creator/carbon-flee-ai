@@ -29,23 +29,26 @@ export default function CarbonHeatmap({ data }: CarbonHeatmapProps) {
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map);
 
-    // Add heat layer if leaflet.heat is loaded
-    if ((L as any).heatLayer) {
-      (L as any).heatLayer(data, {
-        radius: 35,
-        blur: 15,
-        maxZoom: 17,
-        gradient: { 
-          0.2: "blue", 
-          0.4: "lime", 
-          0.6: "yellow", 
-          0.8: "orange", 
-          1.0: "red" 
-        },
-      }).addTo(map);
-    }
+    // Use a small delay to ensure the container is fully rendered and sized
+    const timer = setTimeout(() => {
+      if ((L as any).heatLayer && mapRef.current) {
+        (L as any).heatLayer(data, {
+          radius: 35,
+          blur: 15,
+          maxZoom: 17,
+          gradient: { 
+            0.2: "blue", 
+            0.4: "lime", 
+            0.6: "yellow", 
+            0.8: "orange", 
+            1.0: "red" 
+          },
+        }).addTo(mapRef.current);
+      }
+    }, 200);
 
     return () => {
+      clearTimeout(timer);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -56,7 +59,7 @@ export default function CarbonHeatmap({ data }: CarbonHeatmapProps) {
   return (
     <div
       ref={containerRef}
-      className="h-[450px] w-full rounded-xl border shadow-inner z-0"
+      className="h-[450px] w-full rounded-xl border shadow-inner z-0 overflow-hidden"
     />
   );
 }
