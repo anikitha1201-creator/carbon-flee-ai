@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState } from "react"
@@ -12,22 +11,19 @@ import {
   Leaf, 
   Star, 
   ChevronRight, 
-  Zap, 
   BarChart3, 
   ArrowDownRight,
   ShieldCheck,
   Clock,
-  Wallet,
-  ArrowRight
+  Wallet
 } from "lucide-react"
 import { genAISustainabilityReport, GenAISustainabilityReportOutput } from "@/ai/flows/gen-ai-sustainability-report-flow"
 import { ComparisonChart } from "@/components/simulation/comparison-chart"
 import dynamic from "next/dynamic"
 
-// Import Map components dynamically to avoid SSR issues
 const RouteComparison = dynamic(() => import("@/components/route-comparison"), { 
   ssr: false,
-  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground font-medium">Initializing Strategic Comparison Maps...</div>
+  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground font-medium italic">Generating Strategic Comparison Maps...</div>
 })
 
 const PERFORMANCE_METRICS = [
@@ -76,7 +72,7 @@ export default function AnalyticsPage() {
         emissionTrend: "decreasing by 4.2%",
         evUsagePercentage: 45,
         fleetSize: 32,
-        periodDescription: "Q1 2024",
+        periodDescription: "March 2026",
         previousPeriodData: {
           totalCO2Emissions: 13200,
           co2PerDelivery: 9.1
@@ -96,7 +92,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Sustainability Analytics</h1>
-            <p className="text-muted-foreground">Traditional Routing vs Carbon-Aware Routing (CAFS) Performance.</p>
+            <p className="text-muted-foreground">Strategic impact assessment: Traditional vs CAFS routing (March 2026).</p>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" className="gap-2">
@@ -144,24 +140,20 @@ export default function AnalyticsPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
              <div className="space-y-1">
-                <h2 className="text-xl font-bold tracking-tight">Strategy Visual Comparison</h2>
-                <p className="text-sm text-muted-foreground">Comparing traditional logistics paths against CAFS optimized green corridors.</p>
+                <h2 className="text-xl font-bold tracking-tight">Visual Impact Comparison</h2>
+                <p className="text-sm text-muted-foreground">Identifying carbon reduction gains through intelligent pathfinding.</p>
              </div>
           </div>
           
           <RouteComparison />
-
-          <Card className="bg-accent/5 border-accent/20 shadow-sm overflow-hidden hidden">
-             {/* Original card logic hidden in favor of content inside RouteComparison */}
-          </Card>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Strategy Efficiency Comparison</CardTitle>
-                <CardDescription>Visualizing environmental and cost improvements</CardDescription>
+                <CardTitle>Fleet Efficiency Benchmarking</CardTitle>
+                <CardDescription>Visualizing environmental and operational improvements</CardDescription>
               </div>
               <BarChart3 className="h-5 w-5 text-accent opacity-50" />
             </CardHeader>
@@ -176,7 +168,7 @@ export default function AnalyticsPage() {
                   <ShieldCheck className="h-5 w-5 text-accent" />
                   <CardTitle>Eco-Leaderboard</CardTitle>
                </div>
-              <CardDescription>Top performing drivers this month</CardDescription>
+              <CardDescription>Top performing operatives: March 2026</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {[
@@ -209,8 +201,8 @@ export default function AnalyticsPage() {
           <Card className="border-primary/20 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="bg-primary p-6 text-primary-foreground flex items-center justify-between">
                <div>
-                  <h2 className="text-2xl font-bold">Fleet Sustainability Report</h2>
-                  <p className="text-primary-foreground/70">Performance Summary: Q1 2024</p>
+                  <h2 className="text-2xl font-bold">Sustainability Impact Report</h2>
+                  <p className="text-primary-foreground/70">Reporting Period: March 2026</p>
                </div>
                <Button variant="secondary" size="sm" className="gap-2">
                   <Download className="h-4 w-4" /> Export PDF
@@ -226,7 +218,7 @@ export default function AnalyticsPage() {
                  </div>
                  <div className="space-y-4">
                     <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                       <Leaf className="h-5 w-5 text-accent" /> Recommended Improvements
+                       <Leaf className="h-5 w-5 text-accent" /> Actionable Improvements
                     </h3>
                     <ul className="space-y-2">
                        {report.improvements.map((imp, i) => (

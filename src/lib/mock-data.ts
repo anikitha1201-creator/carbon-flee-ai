@@ -7,10 +7,10 @@ export const VEHICLES = [
 ];
 
 export const ORDERS = [
-  { id: 'ord-101', customer: 'EcoShop', pickup: 'Whitefield', dropoff: 'Koramangala', weight: 500, deadline: '2024-05-24 14:00', status: 'Pending', priority: 'High', distance: 14.2 },
-  { id: 'ord-102', customer: 'Global Mart', pickup: 'Electronic City', dropoff: 'MG Road', weight: 1200, deadline: '2024-05-24 16:30', status: 'Assigned', priority: 'Medium', distance: 18.5 },
-  { id: 'ord-103', customer: 'Tech Store', pickup: 'Silk Board', dropoff: 'Hebbal', weight: 300, deadline: '2024-05-24 12:00', status: 'In Transit', priority: 'Critical', distance: 22.1 },
-  { id: 'ord-104', customer: 'Bio Foods', pickup: 'Whitefield', dropoff: 'Indiranagar', weight: 800, deadline: '2024-05-24 18:00', status: 'Pending', priority: 'Low', distance: 8.4 },
+  { id: 'ord-101', customer: 'EcoShop', pickup: 'Whitefield', dropoff: 'Koramangala', weight: 500, deadline: '2026-03-13 14:00', status: 'Pending', priority: 'High', distance: 14.2 },
+  { id: 'ord-102', customer: 'Global Mart', pickup: 'Electronic City', dropoff: 'MG Road', weight: 1200, deadline: '2026-03-13 16:30', status: 'Assigned', priority: 'Medium', distance: 18.5 },
+  { id: 'ord-103', customer: 'Tech Store', pickup: 'Silk Board', dropoff: 'Hebbal', weight: 300, deadline: '2026-03-13 12:00', status: 'In Transit', priority: 'Critical', distance: 22.1 },
+  { id: 'ord-104', customer: 'Bio Foods', pickup: 'Whitefield', dropoff: 'Indiranagar', weight: 800, deadline: '2026-03-13 18:00', status: 'Pending', priority: 'Low', distance: 8.4 },
 ];
 
 export const DRIVERS = [
@@ -31,9 +31,9 @@ export const COORDINATES = {
 };
 
 export const CHARGING_STATIONS = [
-  { name: 'Whitefield Charging Hub', coords: [12.9710, 77.7510], speed: '150kW', available: 4 },
-  { name: 'Electronic City Station', coords: [12.8460, 77.6650], speed: '100kW', available: 2 },
-  { name: 'Indiranagar EV Hub', coords: [12.9790, 77.6420], speed: '50kW', available: 1 },
+  { id: 'cs-1', name: 'Whitefield EV Hub', coords: [12.9710, 77.7510], available: 4, speed: '150kW' },
+  { id: 'cs-2', name: 'Electronic City Charging Station', coords: [12.8460, 77.6650], available: 2, speed: '100kW' },
+  { id: 'cs-3', name: 'Indiranagar Fast Charger', coords: [12.9790, 77.6420], available: 1, speed: '50kW' },
 ];
 
 export const GRID_SCENARIOS = {

@@ -14,10 +14,8 @@ import {
   Activity,
   PackageCheck,
   Play,
-  Clock,
-  Navigation,
-  ShieldCheck,
   Flame,
+  ShieldCheck,
   AlertTriangle
 } from "lucide-react"
 import dynamic from "next/dynamic"
@@ -30,7 +28,7 @@ import { getGridStatus } from "@/lib/grid-carbon-service"
 // Import Map dynamically to avoid SSR issues
 const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
-  loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Command Map...</div>
+  loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground font-medium italic">Initializing Live Telemetry Stream...</div>
 })
 
 export default function HomePage() {
@@ -78,7 +76,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Fleet Command Center</h1>
-            <p className="text-muted-foreground">Real-time carbon performance and autonomous scheduling status.</p>
+            <p className="text-muted-foreground">Real-time carbon performance and autonomous scheduling status for March 2026.</p>
           </div>
           <Button 
             onClick={runGlobalOptimization} 
