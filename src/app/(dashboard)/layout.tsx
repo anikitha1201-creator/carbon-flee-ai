@@ -21,7 +21,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-4">
              <div className="px-3 py-1 bg-accent/10 rounded-full border border-accent/20 flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-                <span className="text-xs font-medium text-accent">System Active</span>
+                <span className="text-xs font-medium text-accent">hellojust explain wt all is done</span>
              </div>
           </div>
         </header>
