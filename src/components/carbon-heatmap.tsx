@@ -45,7 +45,7 @@ export default function CarbonHeatmap({ data }: CarbonHeatmapProps) {
           },
         }).addTo(mapRef.current);
       }
-    }, 200);
+    }, 250);
 
     return () => {
       clearTimeout(timer);

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState } from "react"
@@ -98,9 +99,14 @@ export default function AnalyticsPage() {
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Sustainability Analytics</h1>
             <p className="text-muted-foreground">Traditional Routing vs Carbon-Aware Routing (CAFS) Performance.</p>
           </div>
-          <Button className="gap-2" onClick={generateReport} disabled={loading}>
-            {loading ? "Generating..." : <><FileText className="h-4 w-4" /> Generate ESG Report</>}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" className="gap-2">
+              <Download className="h-4 w-4" /> Export All Data
+            </Button>
+            <Button className="gap-2" onClick={generateReport} disabled={loading}>
+              {loading ? "Generating..." : <><FileText className="h-4 w-4" /> Generate ESG Report</>}
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3">

@@ -1,10 +1,11 @@
+
 "use client";
 
 import { MapContainer, TileLayer, Polyline, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Leaf, Fuel, Clock, ArrowRight } from "lucide-react";
+import { Leaf, Fuel, Clock } from "lucide-react";
 
 // Marker fix for Leaflet
 if (typeof window !== 'undefined') {
