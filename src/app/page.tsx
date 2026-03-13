@@ -19,9 +19,9 @@ import {
 import dynamic from "next/dynamic"
 
 // Import Map dynamically to avoid SSR issues
-const RouteMap = dynamic(() => import("@/components/simulation/route-map"), { 
+const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
-  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Loading Map...</div>
+  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Fleet Map...</div>
 })
 
 export default function HomePage() {
@@ -93,120 +93,55 @@ export default function HomePage() {
           </Card>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-7">
-          <div className="md:col-span-4 space-y-6">
-            <Card className="overflow-hidden shadow-xl border-none">
-              <CardHeader className="bg-muted/50 border-b">
-                 <div className="flex items-center justify-between">
-                    <div>
-                       <CardTitle className="text-lg">Live Delivery Map</CardTitle>
-                       <CardDescription>Real-time fleet tracking across Bangalore</CardDescription>
-                    </div>
-                    <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
-                       <Activity className="h-3 w-3 mr-1" /> Live
-                    </Badge>
-                 </div>
-              </CardHeader>
-              <CardContent className="p-0 h-[400px]">
-                 <RouteMap activeOrderId="ord-101" />
-              </CardContent>
-            </Card>
-
-            <Card className="bg-accent/5 border-accent/20">
-              <CardContent className="p-6">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Active Assignment Details</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                   <div className="space-y-1">
-                      <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                         <User className="h-3 w-3" /> DRIVER
-                      </p>
-                      <p className="text-sm font-semibold">Arun Kumar</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                         <Truck className="h-3 w-3" /> VEHICLE
-                      </p>
-                      <p className="text-sm font-semibold">EV Delivery Van</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] text-muted-foreground font-bold flex items-center gap-1">
-                         <Route className="h-3 w-3" /> DISTANCE
-                      </p>
-                      <p className="text-sm font-semibold">18 km</p>
-                   </div>
-                   <div className="space-y-1">
-                      <p className="text-[10px] text-accent font-bold flex items-center gap-1">
-                         <Leaf className="h-3 w-3" /> CO₂ SAVED
-                      </p>
-                      <p className="text-sm font-bold text-accent">3.85 kg</p>
-                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="md:col-span-3 space-y-6">
-            <Card className="overflow-hidden border-none shadow-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-               <div className="relative p-8 flex flex-col h-full justify-between">
+        <div className="space-y-6">
+          <Card className="overflow-hidden shadow-xl border-none">
+            <CardHeader className="bg-muted/50 border-b">
+               <div className="flex items-center justify-between">
                   <div>
-                    <Badge variant="secondary" className="mb-4 bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md px-3 py-1">System Optimization</Badge>
-                    <h2 className="text-3xl font-bold mb-4 leading-tight">AI Route Intelligence</h2>
-                    <p className="text-primary-foreground/80 text-base">
-                      Automatically prioritizing EV vehicles during Solar Peaks.
-                    </p>
+                     <CardTitle className="text-lg">Live Fleet Monitoring</CardTitle>
+                     <CardDescription>Real-time vehicle tracking across the network</CardDescription>
                   </div>
-                  <div className="mt-8 space-y-4">
-                     <div className="flex items-center justify-between text-sm">
-                        <span>Grid Intensity</span>
-                        <span className="font-bold">45 gCO₂/kWh</span>
-                     </div>
-                     <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
-                        <div className="h-full bg-accent w-1/4" />
-                     </div>
-                  </div>
-                  <div className="absolute top-8 right-8 opacity-20 pointer-events-none">
-                     <Zap className="h-32 w-32" />
-                  </div>
+                  <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+                     <Activity className="h-3 w-3 mr-1" /> System Active
+                  </Badge>
                </div>
+            </CardHeader>
+            <CardContent className="p-0">
+               <FleetLiveMap />
+            </CardContent>
+          </Card>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-muted-foreground">Active Vehicles</p>
+                  <Truck className="h-4 w-4 text-primary" />
+                </div>
+                <div className="mt-2 text-3xl font-bold">12</div>
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Currently in route</p>
+              </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Fleet Composition</CardTitle>
-                <CardDescription>Target: 100% EV by 2026</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2"><div className="h-3 w-3 rounded-full bg-accent" /> Electric (EV)</span>
-                    <span className="font-bold">45%</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                     <div className="h-full bg-accent w-[45%]" />
-                  </div>
+            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-muted-foreground">EV Vehicles</p>
+                  <Zap className="h-4 w-4 text-accent" />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2"><div className="h-3 w-3 rounded-full bg-primary" /> Diesel</span>
-                    <span className="font-bold">35%</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                     <div className="h-full bg-primary w-[35%]" />
-                  </div>
+                <div className="mt-2 text-3xl font-bold text-accent">5</div>
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">85% efficiency avg.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-medium text-muted-foreground">CO₂ Saved (Today)</p>
+                  <Leaf className="h-4 w-4 text-accent" />
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2"><div className="h-3 w-3 rounded-full bg-orange-400" /> Hybrid</span>
-                    <span className="font-bold">20%</span>
-                  </div>
-                  <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                     <div className="h-full bg-orange-400 w-[20%]" />
-                  </div>
-                </div>
-                <div className="pt-4 border-t flex items-center justify-between text-xs text-muted-foreground">
-                   <span>Total: 32 Vehicles</span>
-                   <span className="text-accent font-semibold underline cursor-pointer">Live availability map</span>
-                </div>
+                <div className="mt-2 text-3xl font-bold text-accent">28 kg</div>
+                <p className="text-[10px] text-muted-foreground mt-1 uppercase font-bold">Since 08:00 AM IST</p>
               </CardContent>
             </Card>
           </div>
