@@ -8,7 +8,7 @@ import { calculateCarbonEmission } from '@/lib/carbon-calculator'
 import { BatteryCharging, Truck, MapPin } from 'lucide-react'
 import { renderToStaticMarkup } from 'react-dom/server'
 
-// Fix for default marker icons
+// Fix for default marker icons in Next.js
 const fixLeafletIcons = () => {
   // @ts-ignore
   delete L.Icon.Default.prototype._getIconUrl
