@@ -5,14 +5,54 @@ import DashboardLayout from "../(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Download, TrendingUp, Leaf, Star, ChevronRight, Zap, BarChart3 } from "lucide-react"
+import { 
+  FileText, 
+  Download, 
+  TrendingUp, 
+  Leaf, 
+  Star, 
+  ChevronRight, 
+  Zap, 
+  BarChart3, 
+  ArrowDownRight,
+  ShieldCheck,
+  Clock,
+  Wallet
+} from "lucide-react"
 import { genAISustainabilityReport, GenAISustainabilityReportOutput } from "@/ai/flows/gen-ai-sustainability-report-flow"
 import { ComparisonChart } from "@/components/simulation/comparison-chart"
 
-const COMPARISON_DATA = [
+const PERFORMANCE_METRICS = [
+  { 
+    title: "CO₂ per Delivery", 
+    traditional: "4.5 kg", 
+    cafs: "2.79 kg", 
+    savings: "38%", 
+    icon: Leaf,
+    color: "text-accent"
+  },
+  { 
+    title: "Avg Fuel Cost", 
+    traditional: "₹213", 
+    cafs: "₹166", 
+    savings: "22%", 
+    icon: Wallet,
+    color: "text-blue-500"
+  },
+  { 
+    title: "Delivery Time", 
+    traditional: "45 min", 
+    cafs: "35 min", 
+    savings: "22%", 
+    icon: Clock,
+    color: "text-orange-500"
+  },
+]
+
+const CHART_DATA = [
   { metric: "CO₂ / Delivery (kg)", traditional: 4.5, cafs: 2.79, unit: "kg" },
-  { metric: "Fuel Cost / Order ($)", traditional: 21.3, cafs: 16.6, unit: "$" },
-  { metric: "Avg. Time (min)", traditional: 45, cafs: 35, unit: "min" },
+  { metric: "Fuel Cost / Order (₹/10)", traditional: 21.3, cafs: 16.6, unit: "₹" },
+  { metric: "Avg. Time (min/10)", traditional: 4.5, cafs: 3.5, unit: "min" },
 ]
 
 export default function AnalyticsPage() {
@@ -48,30 +88,66 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Sustainability Analytics</h1>
-            <p className="text-muted-foreground">Track environmental impact and strategy comparison metrics.</p>
+            <p className="text-muted-foreground">Traditional Routing vs Carbon-Aware Routing (CAFS) Performance.</p>
           </div>
           <Button className="gap-2" onClick={generateReport} disabled={loading}>
             {loading ? "Generating..." : <><FileText className="h-4 w-4" /> Generate ESG Report</>}
           </Button>
         </div>
 
+        <div className="grid gap-6 md:grid-cols-3">
+           {PERFORMANCE_METRICS.map((metric, i) => (
+             <Card key={i} className="relative overflow-hidden group">
+                <div className={`absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform`}>
+                   <metric.icon className={`h-16 w-16 ${metric.color}`} />
+                </div>
+                <CardHeader className="pb-2">
+                   <CardDescription className="text-xs uppercase font-bold tracking-wider">{metric.title}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                   <div className="flex items-end justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm text-muted-foreground">Traditional</p>
+                        <p className="text-lg font-bold text-muted-foreground line-through">{metric.traditional}</p>
+                      </div>
+                      <div className="text-right space-y-1">
+                        <p className="text-sm font-semibold text-accent">CAFS Optimized</p>
+                        <p className="text-2xl font-black text-foreground">{metric.cafs}</p>
+                      </div>
+                   </div>
+                   <div className="pt-2 border-t">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                         <span className="text-muted-foreground">Reduction Gain</span>
+                         <span className="text-accent flex items-center gap-1">
+                            <ArrowDownRight className="h-3 w-3" /> {metric.savings}
+                         </span>
+                      </div>
+                   </div>
+                </CardContent>
+             </Card>
+           ))}
+        </div>
+
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Strategy Comparison</CardTitle>
-                <CardDescription>Traditional vs. Carbon-Aware Routing (CAFS)</CardDescription>
+                <CardTitle>Strategy Efficiency Comparison</CardTitle>
+                <CardDescription>Visualizing environmental and cost improvements</CardDescription>
               </div>
               <BarChart3 className="h-5 w-5 text-accent opacity-50" />
             </CardHeader>
             <CardContent className="h-80">
-               <ComparisonChart data={COMPARISON_DATA} />
+               <ComparisonChart data={CHART_DATA} />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Green Efficiency Leaders</CardTitle>
+               <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 text-accent" />
+                  <CardTitle>Eco-Leaderboard</CardTitle>
+               </div>
               <CardDescription>Top performing drivers this month</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -116,13 +192,13 @@ export default function AnalyticsPage() {
               <div className="grid gap-6 md:grid-cols-2">
                  <div className="space-y-4">
                     <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                       <TrendingUp className="h-5 w-5 text-accent" /> Key Insights
+                       <TrendingUp className="h-5 w-5 text-accent" /> Strategic Insights
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">{report.summary}</p>
                  </div>
                  <div className="space-y-4">
                     <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                       <Leaf className="h-5 w-5 text-accent" /> Strategic Improvements
+                       <Leaf className="h-5 w-5 text-accent" /> Recommended Improvements
                     </h3>
                     <ul className="space-y-2">
                        {report.improvements.map((imp, i) => (
