@@ -1,11 +1,14 @@
-
 "use client"
 
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { useEffect, useState } from 'react'
+import { COORDINATES, CHARGING_STATIONS, ORDERS, VEHICLES, DRIVERS } from '@/lib/mock-data'
+import { calculateCarbonEmission } from '@/lib/carbon-calculator'
+import { BatteryCharging, Truck, MapPin } from 'lucide-react'
+import { renderToStaticMarkup } from 'react-dom/server'
 
-// Fix for default marker icons in Leaflet with Next.js
+// Fix for default marker icons
 const fixLeafletIcons = () => {
   // @ts-ignore
   delete L.Icon.Default.prototype._getIconUrl
@@ -16,10 +19,21 @@ const fixLeafletIcons = () => {
   })
 }
 
-const whitefield: [number, number] = [12.9698, 77.7499]
-const koramangala: [number, number] = [12.9352, 77.6245]
+// Custom Icons
+const createIcon = (color: string) => L.divIcon({
+  html: renderToStaticMarkup(<MapPin className="h-6 w-6" style={{ color }} fill={color + '20'} />),
+  className: 'custom-div-icon',
+  iconSize: [24, 24],
+  iconAnchor: [12, 24],
+})
 
-export default function RouteMap() {
+const chargingIcon = L.divIcon({
+  html: renderToStaticMarkup(<BatteryCharging className="h-5 w-5 text-accent" />),
+  className: 'charging-icon',
+  iconSize: [20, 20],
+})
+
+export default function RouteMap({ activeOrderId }: { activeOrderId?: string }) {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -29,66 +43,104 @@ export default function RouteMap() {
 
   if (!isMounted) return <div className="h-full w-full bg-muted animate-pulse rounded-xl" />
 
+  const getVehicleColor = (type: string) => {
+    switch (type) {
+      case 'EV': return '#10b981'; // green
+      case 'Diesel': return '#ef4444'; // red
+      case 'Hybrid': return '#eab308'; // yellow
+      default: return '#3b82f6';
+    }
+  }
+
+  // Filter orders to show. If activeOrderId is provided, only show that one.
+  const ordersToShow = activeOrderId 
+    ? ORDERS.filter(o => o.id === activeOrderId)
+    : ORDERS;
+
   return (
-    <div className="h-full w-full relative group">
+    <div className="h-full w-full relative">
       <MapContainer 
         center={[12.9525, 77.6872]} 
-        zoom={12} 
+        zoom={11} 
         scrollWheelZoom={false}
-        className="rounded-xl shadow-inner border border-muted"
+        className="h-full w-full rounded-xl"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={whitefield}>
-          <Popup>
-            <div className="text-xs">
-              <p className="font-bold">Whitefield Hub</p>
-              <p className="text-muted-foreground">Pickup Location</p>
+
+        {/* Charging Stations */}
+        {CHARGING_STATIONS.map((station, idx) => (
+          <Marker key={idx} position={station.coords as [number, number]} icon={chargingIcon}>
+            <Popup>
+              <div className="text-xs">
+                <p className="font-bold text-accent">{station.name}</p>
+                <p>Speed: {station.speed}</p>
+                <p>Available: {station.available} ports</p>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+        {/* Delivery Routes */}
+        {ordersToShow.map((order) => {
+          const pickup = COORDINATES[order.pickup as keyof typeof COORDINATES] as [number, number];
+          const dropoff = COORDINATES[order.dropoff as keyof typeof COORDINATES] as [number, number];
+          
+          // Find assigned driver and vehicle for metadata
+          const driver = DRIVERS.find(d => d.activeRouteId === order.id);
+          const vehicle = VEHICLES.find(v => v.id === driver?.assignedVehicle);
+          const color = getVehicleColor(vehicle?.type || 'Diesel');
+
+          if (!pickup || !dropoff) return null;
+
+          return (
+            <div key={order.id}>
+              <Marker position={pickup} icon={createIcon(color)}>
+                <Popup>
+                  <div className="text-xs">
+                    <p className="font-bold">Pickup: {order.pickup}</p>
+                    <p>Order ID: {order.id}</p>
+                  </div>
+                </Popup>
+              </Marker>
+              <Marker position={dropoff} icon={createIcon('#1e293b')}>
+                <Popup>
+                  <div className="text-xs">
+                    <p className="font-bold">Dropoff: {order.dropoff}</p>
+                    <p>Customer: {order.customer}</p>
+                  </div>
+                </Popup>
+              </Marker>
+              <Polyline 
+                positions={[pickup, dropoff]} 
+                color={color}
+                weight={4} 
+                opacity={0.6}
+                dashArray="5, 10"
+              />
             </div>
-          </Popup>
-        </Marker>
-        <Marker position={koramangala}>
-          <Popup>
-             <div className="text-xs">
-              <p className="font-bold">Koramangala Station</p>
-              <p className="text-muted-foreground">Drop-off Destination</p>
-            </div>
-          </Popup>
-        </Marker>
-        <Polyline 
-          positions={[whitefield, koramangala]} 
-          color="hsl(var(--primary))" 
-          weight={4} 
-          opacity={0.7}
-          dashArray="10, 10"
-        />
+          )
+        })}
       </MapContainer>
       
-      <div className="absolute bottom-4 left-4 z-[1000] bg-background/95 backdrop-blur-sm p-4 rounded-xl border shadow-xl flex flex-col gap-3 min-w-[180px]">
-         <div className="flex items-center justify-between border-b pb-2">
-            <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">Whitefield → Koramangala</span>
-         </div>
-         <div className="grid grid-cols-2 gap-4">
-            <div>
-               <p className="text-[10px] text-muted-foreground">Distance</p>
-               <p className="text-sm font-bold">14.2 km</p>
-            </div>
-            <div>
-               <p className="text-[10px] text-muted-foreground">ETA</p>
-               <p className="text-sm font-bold">42 mins</p>
-            </div>
-            <div>
-               <p className="text-[10px] text-muted-foreground text-accent">CO₂ Saved</p>
-               <p className="text-sm font-bold text-accent">8.4 kg</p>
-            </div>
-            <div>
-               <p className="text-[10px] text-muted-foreground">Route</p>
-               <p className="text-sm font-bold">Optimized</p>
-            </div>
-         </div>
-      </div>
+      {!activeOrderId && (
+        <div className="absolute top-4 right-4 z-[1000] bg-background/95 backdrop-blur-sm p-3 rounded-lg border shadow-lg space-y-2">
+           <h4 className="text-[10px] font-bold uppercase text-muted-foreground">Legend</h4>
+           <div className="space-y-1">
+              <div className="flex items-center gap-2 text-[10px]">
+                 <div className="h-2 w-2 rounded-full bg-[#10b981]" /> <span>Electric Route</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px]">
+                 <div className="h-2 w-2 rounded-full bg-[#ef4444]" /> <span>Diesel Route</span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px]">
+                 <div className="h-2 w-2 rounded-full bg-[#eab308]" /> <span>Hybrid Route</span>
+              </div>
+           </div>
+        </div>
+      )}
     </div>
   )
 }

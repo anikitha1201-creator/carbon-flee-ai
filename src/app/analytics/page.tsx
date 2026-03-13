@@ -5,8 +5,15 @@ import DashboardLayout from "../(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Download, TrendingUp, Leaf, Star, ChevronRight } from "lucide-react"
+import { FileText, Download, TrendingUp, Leaf, Star, ChevronRight, Zap, BarChart3 } from "lucide-react"
 import { genAISustainabilityReport, GenAISustainabilityReportOutput } from "@/ai/flows/gen-ai-sustainability-report-flow"
+import { ComparisonChart } from "@/components/simulation/comparison-chart"
+
+const COMPARISON_DATA = [
+  { metric: "CO₂ / Delivery (kg)", traditional: 4.5, cafs: 2.79, unit: "kg" },
+  { metric: "Fuel Cost / Order ($)", traditional: 21.3, cafs: 16.6, unit: "$" },
+  { metric: "Avg. Time (min)", traditional: 45, cafs: 35, unit: "min" },
+]
 
 export default function AnalyticsPage() {
   const [report, setReport] = useState<GenAISustainabilityReportOutput | null>(null)
@@ -41,7 +48,7 @@ export default function AnalyticsPage() {
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Sustainability Analytics</h1>
-            <p className="text-muted-foreground">Track your environmental impact and generate ESG compliance reports.</p>
+            <p className="text-muted-foreground">Track environmental impact and strategy comparison metrics.</p>
           </div>
           <Button className="gap-2" onClick={generateReport} disabled={loading}>
             {loading ? "Generating..." : <><FileText className="h-4 w-4" /> Generate ESG Report</>}
@@ -50,19 +57,22 @@ export default function AnalyticsPage() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Emissions Over Time</CardTitle>
-              <CardDescription>Monthly carbon performance (kg CO₂)</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Strategy Comparison</CardTitle>
+                <CardDescription>Traditional vs. Carbon-Aware Routing (CAFS)</CardDescription>
+              </div>
+              <BarChart3 className="h-5 w-5 text-accent opacity-50" />
             </CardHeader>
-            <CardContent className="h-64 flex items-center justify-center text-muted-foreground bg-muted/20 m-6 rounded-xl border border-dashed border-muted-foreground/30">
-               [Monthly Performance Chart]
+            <CardContent className="h-80">
+               <ComparisonChart data={COMPARISON_DATA} />
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Top Green Drivers</CardTitle>
-              <CardDescription>Most efficient energy usage this month</CardDescription>
+              <CardTitle>Green Efficiency Leaders</CardTitle>
+              <CardDescription>Top performing drivers this month</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {[
@@ -86,7 +96,7 @@ export default function AnalyticsPage() {
                    </div>
                 </div>
               ))}
-              <Button variant="ghost" className="w-full text-xs text-primary h-8">View leaderboard <ChevronRight className="h-3 w-3" /></Button>
+              <Button variant="ghost" className="w-full text-xs text-primary h-8">View full leaderboard <ChevronRight className="h-3 w-3" /></Button>
             </CardContent>
           </Card>
         </div>
@@ -112,7 +122,7 @@ export default function AnalyticsPage() {
                  </div>
                  <div className="space-y-4">
                     <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                       <Leaf className="h-5 w-5 text-accent" /> Areas for Improvement
+                       <Leaf className="h-5 w-5 text-accent" /> Strategic Improvements
                     </h3>
                     <ul className="space-y-2">
                        {report.improvements.map((imp, i) => (
