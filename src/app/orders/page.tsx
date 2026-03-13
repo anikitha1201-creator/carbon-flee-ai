@@ -1,0 +1,104 @@
+import DashboardLayout from "../(dashboard)/layout"
+import { ORDERS } from "@/lib/mock-data"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { 
+  Package, 
+  Search, 
+  Filter, 
+  Calendar,
+  MapPin,
+  Clock,
+  ChevronRight,
+  Route
+} from "lucide-react"
+import { Input } from "@/components/ui/input"
+
+export default function OrdersPage() {
+  return (
+    <DashboardLayout>
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Order Queue</h1>
+            <p className="text-muted-foreground">Manage incoming delivery requests and track status in real-time.</p>
+          </div>
+          <Button className="gap-2">
+            <Package className="h-4 w-4" /> New Order
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-4 bg-card p-4 rounded-xl border shadow-sm">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Search orders by ID or customer..." className="pl-10" />
+          </div>
+          <Button variant="outline" className="gap-2">
+            <Filter className="h-4 w-4" /> Filter
+          </Button>
+        </div>
+
+        <div className="grid gap-4">
+          {ORDERS.map((order) => (
+            <Card key={order.id} className="hover:shadow-md transition-all group overflow-hidden border-l-4 border-l-primary">
+              <CardContent className="p-0">
+                <div className="flex flex-col md:flex-row items-center">
+                  <div className="p-6 flex-1 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold text-primary">{order.id}</span>
+                        <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">{order.customer}</Badge>
+                      </div>
+                      <Badge 
+                        variant={order.priority === 'Critical' ? 'destructive' : order.priority === 'High' ? 'default' : 'secondary'}
+                        className="rounded-sm"
+                      >
+                        {order.priority} Priority
+                      </Badge>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                       <div className="flex items-start gap-3">
+                          <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">Route</p>
+                            <p className="text-xs font-medium">{order.pickup} <ChevronRight className="inline h-3 w-3" /> {order.dropoff}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-start gap-3">
+                          <Clock className="h-4 w-4 text-muted-foreground mt-0.5" />
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">Deadline</p>
+                            <p className="text-xs font-medium">{order.deadline}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-start gap-3">
+                          <div className="h-4 w-4 flex items-center justify-center text-muted-foreground mt-0.5 font-bold text-[10px]">KG</div>
+                          <div>
+                            <p className="text-[10px] uppercase font-bold text-muted-foreground">Weight</p>
+                            <p className="text-xs font-medium">{order.weight} kg</p>
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+
+                  <div className="w-full md:w-auto p-6 md:border-l bg-muted/10 flex flex-col gap-2 min-w-[200px] justify-center">
+                     <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-muted-foreground">Status</span>
+                        <Badge className="bg-orange-500 hover:bg-orange-600">{order.status}</Badge>
+                     </div>
+                     <Button size="sm" className="w-full gap-2">
+                        <Route className="h-4 w-4" /> Assign & Optimize
+                     </Button>
+                     <Button size="sm" variant="ghost" className="w-full text-xs">View Details</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </DashboardLayout>
+  )
+}
