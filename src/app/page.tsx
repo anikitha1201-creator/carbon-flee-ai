@@ -1,8 +1,11 @@
+
 "use client"
 
+import { useState, useEffect } from "react"
 import DashboardLayout from "./(dashboard)/layout"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { 
   Truck, 
   Leaf, 
@@ -12,43 +15,89 @@ import {
   TrendingDown,
   Activity,
   PackageCheck,
+  Play,
+  Clock,
+  Navigation,
+  ShieldCheck
 } from "lucide-react"
 import dynamic from "next/dynamic"
 import { ORDERS, VEHICLES } from "@/lib/mock-data"
 import { calculateCarbonEmission, calculateFuelCost } from "@/lib/carbon-engine"
+import { useToast } from "@/hooks/use-toast"
+import { optimizeFleetOrders } from "@/lib/fleet-optimizer"
+import { getGridStatus } from "@/lib/grid-carbon-service"
 
 const FleetLiveMap = dynamic(() => import("@/components/fleet-live-map"), { 
   ssr: false,
-  loading: () => <div className="h-[450px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Fleet Live Tracking...</div>
+  loading: () => <div className="h-[500px] w-full bg-muted animate-pulse rounded-xl flex items-center justify-center text-muted-foreground">Initializing Live Command Map...</div>
 })
 
 export default function HomePage() {
-  // Dynamic KPI Calculations
-  const activeVehicles = VEHICLES.filter(v => v.status === 'Active').length;
-  const evVehicles = VEHICLES.filter(v => v.type === 'EV').length;
-  const evUtilization = Math.round((evVehicles / VEHICLES.length) * 100);
-  
-  // Simulated Daily Savings
-  const co2SavedToday = 28.4; // kg
-  const fuelCostSaved = 450; // Currency units
-  const ordersOptimized = ORDERS.length;
+  const { toast } = useToast()
+  const [isOptimizing, setIsOptimizing] = useState(false)
+  const [metrics, setMetrics] = useState({
+    co2Saved: 28.4,
+    fuelSaved: 450,
+    evUtilization: 65,
+    ordersOptimized: ORDERS.length,
+    avgTime: 38
+  })
+
+  const runGlobalOptimization = async () => {
+    setIsOptimizing(true)
+    // Simulate engine processing
+    await new Promise(r => setTimeout(r, 1500))
+    
+    const grid = getGridStatus('Solar Peak')
+    const totalBasline = ORDERS.reduce((acc, o) => acc + calculateCarbonEmission(o.distance, 'diesel').co2Emission, 0)
+    const totalOptimized = ORDERS.reduce((acc, o) => {
+      const res = optimizeFleetOrders(o, VEHICLES as any, grid.carbonIntensity)
+      return acc + (res?.estimatedCO2 || 0)
+    }, 0)
+
+    const saved = totalBasline - totalOptimized
+    
+    setMetrics({
+      co2Saved: Number(saved.toFixed(1)),
+      fuelSaved: 620,
+      evUtilization: 82,
+      ordersOptimized: ORDERS.length,
+      avgTime: 32
+    })
+
+    toast({
+      title: "Fleet Optimization Complete",
+      description: `CO2 emissions reduced by ${((saved/totalBasline)*100).toFixed(0)}% across all active routes.`,
+    })
+    setIsOptimizing(false)
+  }
 
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Operational Overview</h1>
-          <p className="text-muted-foreground">Real-time carbon performance and fleet utilization metrics.</p>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Fleet Command Center</h1>
+            <p className="text-muted-foreground">Real-time carbon performance and autonomous scheduling status.</p>
+          </div>
+          <Button 
+            onClick={runGlobalOptimization} 
+            disabled={isOptimizing}
+            className="gap-2 bg-accent hover:bg-accent/90 shadow-lg px-6"
+          >
+            {isOptimizing ? <Activity className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4 fill-current" />}
+            {isOptimizing ? "Optimizing Fleet..." : "Run Carbon Optimizer"}
+          </Button>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card className="hover:shadow-md transition-shadow cursor-default border-l-4 border-l-accent bg-accent/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] uppercase font-bold tracking-wider">CO₂ Saved Today</CardTitle>
+              <CardTitle className="text-[10px] uppercase font-bold tracking-wider text-accent">CO₂ Saved Today</CardTitle>
               <Leaf className="h-4 w-4 text-accent" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black">{co2SavedToday} kg</div>
+              <div className="text-3xl font-black">{metrics.co2Saved} kg</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
                 <span className="text-accent flex items-center">
                   <ArrowUpRight className="h-3 w-3" /> +18.4%
@@ -59,16 +108,16 @@ export default function HomePage() {
           </Card>
           <Card className="hover:shadow-md transition-shadow cursor-default border-l-4 border-l-primary bg-primary/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] uppercase font-bold tracking-wider">EV Utilization</CardTitle>
+              <CardTitle className="text-[10px] uppercase font-bold tracking-wider text-primary">EV Utilization</CardTitle>
               <Zap className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black">{evUtilization}%</div>
+              <div className="text-3xl font-black">{metrics.evUtilization}%</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
                 <span className="text-primary flex items-center">
-                  <Activity className="h-3 w-3" /> Active
+                  <Activity className="h-3 w-3" /> Grid Active
                 </span>
-                Grid Optimized
+                Optimized
               </p>
             </CardContent>
           </Card>
@@ -78,7 +127,7 @@ export default function HomePage() {
               <PackageCheck className="h-4 w-4 text-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black">{ordersOptimized}</div>
+              <div className="text-3xl font-black">{metrics.ordersOptimized}</div>
               <p className="text-[10px] text-muted-foreground mt-1 font-bold">
                 100% Automation Status
               </p>
@@ -86,11 +135,11 @@ export default function HomePage() {
           </Card>
           <Card className="hover:shadow-md transition-shadow cursor-default border-l-4 border-l-orange-500 bg-orange-500/5">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-[10px] uppercase font-bold tracking-wider">Fuel Cost Saved</CardTitle>
+              <CardTitle className="text-[10px] uppercase font-bold tracking-wider text-orange-500">Fuel Cost Saved</CardTitle>
               <DollarSign className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-black">₹{fuelCostSaved}</div>
+              <div className="text-3xl font-black">₹{metrics.fuelSaved}</div>
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 mt-1 font-bold">
                 <span className="text-accent flex items-center">
                   <TrendingDown className="h-3 w-3" /> -12%
@@ -105,11 +154,11 @@ export default function HomePage() {
           <Card className="overflow-hidden shadow-2xl border-none">
             <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between">
                <div>
-                  <CardTitle className="text-lg">Fleet Live Telemetry</CardTitle>
-                  <CardDescription>Real-time asset positioning across distribution centers</CardDescription>
+                  <CardTitle className="text-lg">Real-Time Fleet Telemetry</CardTitle>
+                  <CardDescription>Visualizing live asset movement and environmental compliance</CardDescription>
                </div>
-               <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20 animate-pulse font-bold">
-                  <Activity className="h-3 w-3 mr-1" /> Live
+               <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20 animate-pulse font-bold px-4">
+                  <Activity className="h-3 w-3 mr-1" /> System Live
                </Badge>
             </CardHeader>
             <CardContent className="p-0">
@@ -117,38 +166,46 @@ export default function HomePage() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Active Fleet</p>
-                  <Truck className="h-5 w-5 text-primary" />
-                </div>
-                <div className="mt-2 text-4xl font-black">{activeVehicles}</div>
-                <p className="text-[10px] text-muted-foreground mt-2 font-bold uppercase italic opacity-60">Deployment phase</p>
-              </CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <Card className="bg-card border shadow-sm p-6 space-y-2">
+               <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span className="text-[10px] uppercase font-bold">Avg. Time / Route</span>
+               </div>
+               <p className="text-2xl font-black">{metrics.avgTime} min</p>
+               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-3/4" />
+               </div>
             </Card>
-
-            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Electric Units</p>
-                  <Zap className="h-5 w-5 text-accent" />
-                </div>
-                <div className="mt-2 text-4xl font-black text-accent">{evVehicles}</div>
-                <p className="text-[10px] text-muted-foreground mt-2 font-bold uppercase italic opacity-60">85% efficiency avg.</p>
-              </CardContent>
+            <Card className="bg-card border shadow-sm p-6 space-y-2">
+               <div className="flex items-center gap-2 text-muted-foreground">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span className="text-[10px] uppercase font-bold">Efficiency Score</span>
+               </div>
+               <p className="text-2xl font-black text-accent">94%</p>
+               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-accent w-[94%]" />
+               </div>
             </Card>
-
-            <Card className="bg-card hover:bg-muted/10 transition-colors border shadow-sm border-accent/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Session CO₂ Saved</p>
-                  <Leaf className="h-5 w-5 text-accent" />
-                </div>
-                <div className="mt-2 text-4xl font-black text-accent">{co2SavedToday} kg</div>
-                <p className="text-[10px] text-muted-foreground mt-2 font-bold uppercase italic opacity-60">Since system boot</p>
-              </CardContent>
+            <Card className="bg-card border shadow-sm p-6 space-y-2">
+               <div className="flex items-center gap-2 text-muted-foreground">
+                  <PackageCheck className="h-4 w-4" />
+                  <span className="text-[10px] uppercase font-bold">Total Deliveries</span>
+               </div>
+               <p className="text-2xl font-black">124</p>
+               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-secondary w-2/3" />
+               </div>
+            </Card>
+            <Card className="bg-card border shadow-sm p-6 space-y-2">
+               <div className="flex items-center gap-2 text-muted-foreground">
+                  <Navigation className="h-4 w-4" />
+                  <span className="text-[10px] uppercase font-bold">Total Distance</span>
+               </div>
+               <p className="text-2xl font-black">1,842 km</p>
+               <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-orange-500 w-4/5" />
+               </div>
             </Card>
           </div>
         </div>
